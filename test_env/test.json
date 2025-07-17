@@ -1,0 +1,58 @@
+[
+    {
+        "sons": [
+            1,
+            2
+        ],
+        "fathers": [
+            0
+        ],
+        "ancestors": [
+            0
+        ],
+        "content": {
+            "name": "a"
+        }
+    },
+    {
+        "sons": [
+            3
+        ],
+        "fathers": [
+            0
+        ],
+        "ancestors": [
+            0
+        ],
+        "content": {
+            "name": "b"
+        }
+    },
+    {
+        "sons": [
+            3
+        ],
+        "fathers": [
+            0
+        ],
+        "ancestors": [
+            0
+        ],
+        "content": {
+            "name": "c"
+        }
+    },
+    {
+        "sons": [],
+        "fathers": [
+            1,
+            2
+        ],
+        "ancestors": [
+            0
+        ],
+        "content": {
+            "name": "d"
+        }
+    }
+]

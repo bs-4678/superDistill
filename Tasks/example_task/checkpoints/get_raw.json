@@ -1,0 +1,19 @@
+[
+    {
+        "sons": [],
+        "fathers": [
+            0
+        ],
+        "ancestors": [
+            0
+        ],
+        "content": {
+            "from_path": "oss://ly-llm/data_self_evo/data_agent/train",
+            "task": "example_task",
+            "stage": "RAW",
+            "description": "",
+            "name": "data1_example_task_RAW__root",
+            "path": "/Users/wujinyi/Desktop/mycode/superDistill/data/raw/data1_example_task_RAW__root"
+        }
+    }
+]
