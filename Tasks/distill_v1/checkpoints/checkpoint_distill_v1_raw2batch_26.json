@@ -1,0 +1,108 @@
+[
+    {
+        "sons": [
+            0,
+            1,
+            2,
+            3,
+            4
+        ],
+        "fathers": [
+            0
+        ],
+        "ancestors": [
+            0
+        ],
+        "content": {
+            "task": "example_task",
+            "stage": "ROOT",
+            "description": "root",
+            "name": "data1_example_task_ROOT_root",
+            "path": "No path"
+        }
+    },
+    {
+        "sons": [],
+        "fathers": [
+            0
+        ],
+        "ancestors": [
+            0
+        ],
+        "content": {
+            "api": "http://example.com/api",
+            "task": "example_task",
+            "stage": "TEACHER",
+            "description": "ds-v3-teacher",
+            "name": "model2_example_task_TEACHER_ds-v3-teacher",
+            "path": "No path"
+        }
+    },
+    {
+        "sons": [],
+        "fathers": [
+            0
+        ],
+        "ancestors": [
+            0
+        ],
+        "content": {
+            "task": "example_task",
+            "stage": "BASE_LORA",
+            "description": "oxs6-cheackpoint-60",
+            "name": "model3_example_task_BASE_LORA_oxs6-cheackpoint-60",
+            "path": "/Users/wujinyi/Desktop/mycode/superDistill/tmp"
+        }
+    },
+    {
+        "sons": [],
+        "fathers": [
+            0
+        ],
+        "ancestors": [
+            0
+        ],
+        "content": {
+            "task": "example_task",
+            "stage": "BASE",
+            "description": "qwen3-32b-fp32",
+            "name": "model4_example_task_BASE_qwen3-32b-fp32",
+            "path": "/Users/wujinyi/Desktop/mycode/superDistill/tmp"
+        }
+    },
+    {
+        "sons": [
+            5
+        ],
+        "fathers": [
+            0
+        ],
+        "ancestors": [
+            0
+        ],
+        "content": {
+            "from_path": "oss://ly-llm/data_self_evo/data_agent/train",
+            "task": "example_task",
+            "stage": "RAW",
+            "description": "",
+            "name": "data5_example_task_RAW_",
+            "path": "/Users/wujinyi/Desktop/mycode/superDistill/data/raw/data5_example_task_RAW_/"
+        }
+    },
+    {
+        "sons": [],
+        "fathers": [
+            4
+        ],
+        "ancestors": [
+            0
+        ],
+        "content": {
+            "task": "distill_v1",
+            "stage": "BATCH",
+            "description": "40-4-0-1-deepseek-v3",
+            "name": "data_distill_v1_BATCH_40-4-0-1-deepseek-v3",
+            "path": "/Users/wujinyi/Desktop/mycode/superDistill/data/batch/data_distill_v1_BATCH_40-4-0-1-deepseek-v3"
+        }
+    }
+]

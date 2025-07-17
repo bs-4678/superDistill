@@ -1,0 +1,8 @@
+垃圾桶/
+data/
+.vscode/
+ossutil_output/
+.idea/
+.ossutil_checkpoint/
+__pycache__/
+script/

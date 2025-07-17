@@ -1,0 +1,18 @@
+from superDistill import superNode
+
+a = superNode(sons=[], fathers=[], ancestors=[], content={'name':'a'})
+b = superNode(sons=[], fathers=[a], ancestors=[], content={'name':'b'})
+c = superNode(sons=[], fathers=[a], ancestors=[], content={'name':'c'})
+d = superNode(sons=[], fathers=[b,c], ancestors=[], content={'name':'d'})
+print(a)
+print(b)
+print(c)
+print(d)
+# a.show()
+print("=========================================")
+a.show_all()
+a.save_all('/Users/wujinyi/Desktop/mycode/superDistill/test_env/test.json')
+print("=========================================")
+a.load_all('/Users/wujinyi/Desktop/mycode/superDistill/test_env/test.json')
+a.show_all()
+print("=========================================")
