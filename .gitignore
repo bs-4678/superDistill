@@ -4,3 +4,4 @@ data/
 ossutil_output/
 .idea/
 .ossutil_checkpoint/
+__pycache__/
