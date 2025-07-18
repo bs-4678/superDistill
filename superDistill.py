@@ -373,7 +373,7 @@ class superDistillation():
     
     def batch2distill(self, batch_data, thread_count=2, type='batch', continue_flag=False):
         from tools.batch2distill import batch2distill, multi_thread_batch2distill
-        from tools.single2distill import single2distill, multi_thread_single2distill
+        from tools.single2distill import single2distill, multi_thread_single2distill_pro
         """        
         将批处理数据集转换为蒸馏数据集。
         """
@@ -389,7 +389,7 @@ class superDistillation():
                     continue_flag=continue_flag,  # 是否继续上次的转换
                 )
             else:
-                multi_thread_single2distill(
+                multi_thread_single2distill_pro(
                     batch_path=batch_data.content['path'],
                     distill_path=distill_data.content['path'],
                     error_file_path=distill_error_data.content['path'],
@@ -418,40 +418,40 @@ class superDistillation():
             del self.datas[distill_error_data.content['stage']]  # 删除蒸
         self.save_checkpoint(self.cheacpoint_dir, 'batch2distill')  # 保存当前任务进度
         
-    def distill2train(self, raw_data, batch_data, distill_data):
+    def distill2train(self, raw_data, batch_data, distill_data, test_ratio=0.05, raw_ratio=0.):
         from tools.distill2train import distill2train
         """
         将批处理数据集转换为训练数据集。
         """
         # 创建训练和测试数据集
-        train_data = superData(path=self.data_dir + '/train/*', stage='TRAINING', discribe='Train data from batch and distillation data', fathers=[raw_data, batch_data, distill_data])  # 创建训练数据集对象
-        test_data = superData(path=self.data_dir + '/test/*', stage='TESTING', discribe='Test data from batch and distillation data', fathers=[raw_data, batch_data, distill_data])  # 创建测试数据集对象
+        train_data = superData(path=self.data_dir + '/train/*', stage='TRAINING', description=f"train{1-test_ratio}-raw{raw_ratio}", fathers=[raw_data, batch_data, distill_data])  # 创建训练数据集对象
+        test_data = superData(path=self.data_dir + '/test/*', stage='TESTING', description=f"test{test_ratio}-raw{raw_ratio}", fathers=[raw_data, batch_data, distill_data])  # 创建测试数据集对象
         self.datas[train_data.content['stage']] = train_data  # 将训练数据集添加到数据集中
         self.datas[test_data.content['stage']] = test_data  # 将测试数据集添加到数据集中
         distill2train(
-            raw_path=raw_data.path,
-            batch_path=batch_data.path,
-            distill_path=distill_data.path,
-            train_path=train_data.path,
-            test_path=test_data.path,
-            test_ratio=0.05,  # 默认使用0.05的测试比例
-            raw_ratio=0.  # 默认使用0.1的原始数据比例
+            raw_path=raw_data.content["path"],
+            batch_path=batch_data.content["path"],
+            distill_path=distill_data.content["path"],
+            train_path=train_data.content["path"],
+            test_path=test_data.content["path"],
+            test_ratio=test_ratio,  # 默认使用0.05的测试比例
+            raw_ratio=raw_ratio  # 默认使用0.1的原始数据比例
         )
         self.save_checkpoint(self.cheacpoint_dir, 'distill2train')  # 保存当前任务进度
 
-    def train(self, train_data, base, base_lora):
+    def train(self, train_data, base, base_lora, train_type):
         """
         使用蒸馏数据集训练学生模型。
         """
         from tools.train import train
-        self.models['final_student'] = self.model_dir + '/train_models/'  # 更新学生模型路径
-        trained_model = superModel(path=self.model_dir + '/train_models/*', stage='TRAINED', discribe='Trianed student model from distillation data', fathers=[train_data, base, base_lora])  # 创建训练后的学生模型数据集对象
-        self.models[trained_model.content['stage']] = trained_model  # 将原始数据集添加到数据集中
+        trained_lora = superModel(path=self.model_dir + '/train_models/*', stage='TRAINED', description=f"{train_type}", fathers=[train_data, base, base_lora])  # 创建训练后的学生模型数据集对象
+        self.models[trained_lora.content['stage']] = trained_lora  # 将原始数据集添加到数据集中
         train(
             model_path=base.content['path'],  # 学生模型路径
             ckpt_dir_lora=base_lora.content['path'],  # LoRA检查点目录，暂时未定义
             dataset=train_data.content['path'],  # 蒸馏数据集路径
-            output_dir=trained_model.content['path'],  # 输出目录
+            output_dir=trained_lora.content['path'],  # 输出目录
+            train_type=train_type  # 训练脚本
         )
         print(f"Training student model at {base.content['path']} and {base_lora.content['path']} with data from {train_data.content['path']}")
         self.save_checkpoint(self.cheacpoint_dir, 'train')  # 保存当前任务进度

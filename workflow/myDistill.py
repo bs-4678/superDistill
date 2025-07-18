@@ -16,13 +16,13 @@ class myDistill(superDistillation):
         print(f"工作目录已创建: {self.work_dir}")
 
         print("Starting workflow...")
-        # self.load_cheakpoint('/Users/wujinyi/Desktop/mycode/superDistill/Tasks/official_version/get_raw_v1.json')
-        self.load_cheakpoint('/Users/wujinyi/Desktop/mycode/superDistill/Tasks/distill_v1/checkpoints/checkpoint_distill_v1_batch2distill_2.json')
+        self.load_cheakpoint('/Users/wujinyi/Desktop/mycode/superDistill/Tasks/official_version/get_raw_v1.json')
+        # self.load_cheakpoint('/Users/wujinyi/Desktop/mycode/superDistill/Tasks/official_version/batch2distill_v1.json')
         # self.get_raw(self.raw_data_path)
-        # self.raw2batch(raw_data=self.datas['RAW'], model_name='deepseek-v3', ratio=[0, 1], sample_num=40, single_file_nums=4)
-        self.batch2distill(batch_data=self.datas['BATCH'], thread_count=10, type='single', continue_flag=True)
-        # self.distill2train(self.datas['RAW'], self.datas['batch'], self.datas['distill'])
-        # self.train(self.datas['train'], self.models['base'], self.models['base_lora'])
+        self.raw2batch(raw_data=self.datas['RAW'], model_name='deepseek-v3', ratio=[0, 1], sample_num=40000, single_file_nums=4000)
+        self.batch2distill(batch_data=self.datas['BATCH'], thread_count=30, type='single', continue_flag=True)
+        # self.distill2train(self.datas['RAW'], self.datas['BATCH'], self.datas['DISTILLATION'], test_ratio=0.05, raw_ratio=0.)
+        # self.train(self.datas['TRAIN'], self.models['BASE'], self.models['BASE_LORA'], train_type='train_gpus0-4_5e-5_4x4x8_ep1')
         # self.datas['test_score'] = self.model_eval(self.datas['test'])
         # self.datas['gt'] = self.get_ground_truth()
         # self.datas['gt_score'] = self.model_eval(self.datas['gt'])
@@ -67,7 +67,7 @@ if __name__ == "__main__":
     task = "prompt_test1"  # 替换为实际的任务名称
 
     # distiller = myDistill(teacher_api=teacher_api, student_model_path=student_model_path, ckpt_dir_lora=student_model_path, task=task, raw_data_path=raw_data_path, prompt_template=prompt_template)
-    distiller = myDistill(task='distill_v1')
+    distiller = myDistill(task='distill_v2')
     distiller.run()
     
     # nohup python /Users/wujinyi/Desktop/mycode/superDistill/workflow/myDistill.py > /Users/wujinyi/Desktop/mycode/superDistill/workflow/output/run1.log 2>&1 &

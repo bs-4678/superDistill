@@ -88,7 +88,7 @@ def distill2train(raw_path=None, batch_path=None, distill_path=None, train_path=
         # step2:mix
         print("正在采集raw数据。。。")
         raws = superDistillation.data_load(raw_path)
-        print(len(raws))
+        print('raw_nums', len(raws))
 
         sample_num = len(sft_results) * raw_ratio
         print("每隔",int(len(raws)//sample_num), "步采样一次")
@@ -103,11 +103,13 @@ def distill2train(raw_path=None, batch_path=None, distill_path=None, train_path=
 
     print("正在采集batch数据。。。")
     outputs = superDistillation.data_load(batch_path)
-    print(len(results))
+    results = sorted(results, key=lambda x: x['custom_id'])
+    print('batch_len', len(outputs))
             
     print("正在采集distill数据。。。")
     results = superDistillation.data_load(distill_path)
-    print(len(results))
+    results = sorted(results, key=lambda x: x['custom_id'])
+    print('distill_len', len(results))
 
     # step1:sft
     sft_results = []
@@ -195,3 +197,117 @@ def distill2train(raw_path=None, batch_path=None, distill_path=None, train_path=
 
     n0, n1, n2, n3, n4 = len(sample_examples), len(sft_results), len(sft_raws), len(train_examples) + len(test_examples)
     print(f"Done: 共生成数据{n0}条，其中sft数据{n1}条，raw数据{n2}条，训练数据{n3}条，测试数据{n4}条。")
+
+# def distill2train(raw_path=None, batch_path=None, distill_path=None, train_path=None, test_path=None, test_ratio=0.05, raw_ratio=0.):
+#     sft_raws = []
+#     if raw_ratio > 0.001:
+#         # step2:mix
+#         print("正在采集raw数据。。。")
+#         raws = superDistillation.data_load(raw_path)
+#         print('raw_nums', len(raws))
+
+#         sample_num = len(sft_results) * raw_ratio
+#         print("每隔",int(len(raws)//sample_num), "步采样一次")
+#         raws_sample = raws[::int(len(raws)/sample_num) + random.randint(1, 5)]
+
+#         for raw in tqdm(raws_sample):
+#             new_example = deepcopy(sft_example)
+#             new_example['messages'][0]['content'] = raw['prompt']
+#             new_example['messages'][1]['content'] = raw['query']
+#             new_example['messages'][2]['content'] = raw['response']
+#             sft_raws.append(new_example)
+
+#     print("正在采集batch数据。。。")
+#     outputs = superDistillation.data_load(batch_path)
+#     print('batch_len', len(outputs))
+            
+#     print("正在采集distill数据。。。")
+#     results = superDistillation.data_load(distill_path)
+#     print('distill_len', len(results))
+
+#     # step1:sft
+#     sft_results = []
+#     sft_results_2 = []
+#     step2 = 0
+#     false_count = 0
+#     lost_num = 0
+#     for i in tqdm(range(len(results))):
+#         acc = False
+#         sft_result = deepcopy(sft_example)
+#         # output = outputs[i]["body"]["messages"][1]["content"].split("prompt:", "query:", "response:", ",\n    \n# 任务")
+#         while results[i]['custom_id'] != outputs[i+lost_num]['custom_id']:
+#             lost_num += 1
+#             print(f"lost_num: {lost_num}")
+#         output = re.split(r'prompt: |query: |response: |\n    \n# 任务', outputs[i+lost_num]["body"]["messages"][1]["content"])
+#         result = results[i]["response"]["body"]["choices"][0]["message"]["content"].split('\n')
+#         sft_result["messages"][0]["content"] = output[1].replace("请用Quick BI语法的SQL代码回答以下用户问题：", "请用Quick BI语法的SQL代码回答以下用户问题：(请在每一步之前给出你通俗详细的推理描述)")
+#         sft_result["messages"][1]["content"] = output[2] + " /no_think"
+#         sft_result["messages"][2]["content"] = "<think>\n\n</think>\n\n"+output[3]
+#         # 拆分出推理和sql
+#         responses = output[3].replace('\n    \n', '').replace('\n', '').split("```")
+#         sft_result["ans"] = output[3]
+
+#         sql_count = output[3].count('```sql')
+#         python_count = output[3].count('```python')
+#         sft_result["step_nums"] = {'sql_nums':sql_count, 'python_nums':python_count}
+
+#         if "###" not in output[1][:5]:
+#             acc = False
+#         elif "知识库" in output[1]:
+#             acc = False
+#         elif sql_count+python_count == 2:
+#             while len(result) >= 5:
+#                 if '步骤1' not in result[1] or '步骤2' not in result[3]:
+#                     result = result[1:]
+#                 else:
+#                     sft_result["messages"][2]["content"] = output[3].replace(responses[0]+'\n',result[2]+'\n').replace(responses[2]+'\n',result[4]+'\n')
+#                     acc = True
+#                     step2 += 1
+#                     sft_results_2.append(sft_result)
+#                     break
+#         elif sql_count+python_count == 0:
+#             while len(result) >= 3:
+#                 if '步骤1' not in result[1]:
+#                     result = result[1:]
+#                 else:
+#                     sft_result["messages"][2]["content"] = result[2] + '\n```sql\n' + output[3] + '\n```'
+#                     acc = True
+#                     break
+#         elif sql_count+python_count == 1:
+#             while len(result) >= 3:
+#                 if '步骤1' not in result[1]:
+#                     result = result[1:]
+#                 else:
+#                     sft_result["messages"][2]["content"] = result[2] + output[3]
+#                     acc = True
+#                     break
+
+#         if acc == False:
+#             false_count += 1
+#             continue
+#         sft_results.append(sft_result)
+
+#     print(len(sft_results),false_count,step2)
+            
+#     sample_examples = sft_raws + sft_results_2
+#     random.shuffle(sample_examples)
+
+#     split_idx = int(len(sample_examples) * (1-test_ratio))
+#     train_examples = sample_examples[:split_idx]
+#     test_examples = sample_examples[split_idx:]
+
+#     # only 多步
+#     superDistillation.data_save(train_examples, train_path)
+#     print(f"已保存多步数据至 {train_path}")
+
+#     # only 多步
+#     superDistillation.data_save(test_examples, test_path)
+#     print(f"已保存多步数据至 {test_path}")
+
+#     # with open('/home/wjy488852/data/data_train/distill5_5e4_sft_twostep.jsonl', "w", encoding="utf-8") as f:
+#     #     for example in tqdm(sample_examples):
+#     #         json.dump(example, f, ensure_ascii=False)
+#     #         f.write("\n")
+
+#     n0, n1, n2, n3, n4 = len(sample_examples), len(sft_results), len(sft_raws), len(train_examples) + len(test_examples)
+#     print(f"Done: 共生成数据{n0}条，其中sft数据{n1}条，raw数据{n2}条，训练数据{n3}条，测试数据{n4}条。")
